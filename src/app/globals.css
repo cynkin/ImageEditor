@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f3f4f6;
   --foreground: #171717;
 }
+
+/*:root {*/
+/*  --background: #171717;*/
+/*  --foreground: #ffffff;*/
+/*}*/
 
 @theme inline {
   --color-background: var(--background);
@@ -12,15 +17,42 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/*@media (prefers-color-scheme: dark) {*/
+/*  :root {*/
+/*    --background: #0a0a0a;*/
+/*    --foreground: #ededed;*/
+/*  }*/
+/*}*/
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-primary{
+  background:#5423e7
+}
+
+.bg-blue{
+  background: #1568e3;
+}
+
+.color-primary{
+  color: #5423e7;
+}
+
+input[type="range"].styled-slider {
+  @apply w-full h-2 rounded-lg appearance-none bg-gray-300 cursor-pointer;
+}
+
+input[type="range"].styled-slider::-webkit-slider-thumb {
+  @apply w-4 h-4 rounded-full bg-blue-600;
+  -webkit-appearance: none;
+  margin-top: -6px;
+}
+
+input[type="range"].styled-slider::-moz-range-thumb {
+  @apply w-4 h-4 rounded-full bg-blue-600;
+  border: none;
 }
