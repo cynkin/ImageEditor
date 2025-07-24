@@ -17,6 +17,11 @@ export default function ImageEditor() {
         contrast: 100,
         blur: 0,
         opacity: 100,
+        grayScale: 0,
+        hueRotate: 0,
+        invert: 0,
+        sepia: 0,
+        saturate: 100,
     });
 
     const [cropRect, setCropRect] = useState<CropRect>();
@@ -29,7 +34,12 @@ export default function ImageEditor() {
             brightness: 100,
             contrast: 100,
             blur: 0,
-            opacity: 100
+            opacity: 100,
+            grayScale: 0,
+            hueRotate: 0,
+            invert: 0,
+            sepia: 0,
+            saturate: 100,
         });
     }
 
@@ -37,8 +47,14 @@ export default function ImageEditor() {
         const brightness = settings.brightness;
         const contrast = settings.contrast;
         const blur = settings.blur;
-        return `brightness(${brightness}%) contrast(${contrast}%) blur(${blur}px)`;
-    }, [settings.blur, settings.brightness, settings.contrast])
+        const grayScale = settings.grayScale;
+        const hueRotate = settings.hueRotate;
+        const invert = settings.invert;
+        const sepia = settings.sepia;
+        const saturate = settings.saturate;
+        
+        return `brightness(${brightness}%) contrast(${contrast}%) blur(${blur}px) grayscale(${grayScale}%) hue-rotate(${hueRotate}deg) invert(${invert}%) sepia(${sepia}%) saturate(${saturate}%)`;
+    }, [settings.blur, settings.brightness, settings.contrast, settings.grayScale, settings.hueRotate, settings.invert, settings.saturate, settings.sepia])
     
     const renderImage = useCallback(() => {
         const canvas = canvasRef.current;
@@ -85,6 +101,7 @@ export default function ImageEditor() {
             const tempCtx = tempCanvas.getContext('2d');
             if(!tempCtx) return;
 
+            tempCtx.filter = generateFilter();
             tempCtx.drawImage(image, cropRect.x, cropRect.y, cropRect.w, cropRect.h, 0, 0, cropRect.w, cropRect.h);
             const dataUrl = tempCanvas.toDataURL();
             const a = document.createElement('a');
@@ -156,8 +173,7 @@ export default function ImageEditor() {
         c.strokeStyle = "black";
         c.lineWidth = 1.5;
         c.strokeRect(start.x, start.y, w, h);
-        // c.fillStyle = "rgba(0, 0, 0, 0)";
-        // c.fillRect(start.x, start.y, w, h);
+
     }
 
     const handleMouseUp = () => {
@@ -179,65 +195,129 @@ export default function ImageEditor() {
 
     return (
         <div className="p-4 space-y-4 bg-gray-100 min-h-screen">
-            <div className="flex flex-wrap items-center gap-4 bg-white p-4 rounded-xl shadow">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleUpload}
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-600 file:text-white file:cursor-pointer"
-                />
 
-                <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Brightness</label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="200"
-                        value={settings.brightness}
-                        onChange={(e) => setSettings((prev) => ({...prev, brightness: Number(e.target.value)}))}
-                        className="range-input"
-                    />
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleUpload}
+                className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-600 file:text-white file:cursor-pointer"
+            />
+
+            <div className="bg-white p-4 rounded-xl shadow">
+
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Brightness</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="200"
+                            value={settings.brightness}
+                            onChange={(e) => setSettings((prev) => ({...prev, brightness: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Contrast</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="200"
+                            value={settings.contrast}
+                            onChange={(e) => setSettings((prev) => ({...prev, contrast: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Blur</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="25"
+                            value={settings.blur}
+                            onChange={(e) => setSettings((prev) => ({...prev, blur: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Opacity</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={settings.opacity}
+                            onChange={(e) => setSettings((prev) => ({...prev, opacity: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">GrayScale</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={settings.grayScale}
+                            onChange={(e) => setSettings((prev) => ({...prev, grayScale: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Hue Rotate</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={settings.hueRotate}
+                            onChange={(e) => setSettings((prev) => ({...prev, hueRotate: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Invert</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={settings.invert}
+                            onChange={(e) => setSettings((prev) => ({...prev, invert: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Saturate</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={settings.saturate}
+                            onChange={(e) => setSettings((prev) => ({...prev, saturate: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Sepia</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={settings.sepia}
+                            onChange={(e) => setSettings((prev) => ({...prev, sepia: Number(e.target.value)}))}
+                            className="range-input"
+                        />
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Contrast</label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="200"
-                        value={settings.contrast}
-                        onChange={(e) => setSettings((prev) => ({...prev, contrast: Number(e.target.value)}))}
-                        className="styled-slider"
-                    />
+                <div className="flex mt-10 justify-end items-center gap-4">
+                    <button className="ml-auto cursor-pointer px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700" onClick={resetSettings}>
+                        RESET
+                    </button>
+                    <button className="ml-auto cursor-pointer px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" onClick={handleSave}>
+                        SAVE
+                    </button>
                 </div>
-
-                <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Blur</label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="25"
-                        value={settings.blur}
-                        onChange={(e) => setSettings((prev) => ({...prev, blur: Number(e.target.value)}))}
-                        className="range-input"
-                    />
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Opacity</label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={settings.opacity}
-                        onChange={(e) => setSettings((prev) => ({...prev, opacity: Number(e.target.value)}))}
-                        className="range-input"
-                    />
-                </div>
-
-                <button className="ml-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" onClick={handleSave}>
-                    SAVE
-                </button>
             </div>
 
             <div className="relative p-4 flex justify-center bg-white rounded-xl shadow overflow-hidden">
